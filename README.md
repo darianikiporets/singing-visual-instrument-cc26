@@ -129,6 +129,6 @@ Daria Nikiporets
 
 ---
 
-## 💬 Final Note
+## Final Note
 
 This project demonstrates how **simple human input -> the voice can become a powerful tool for creative expression**, combining sound, visuals, and interaction into one unified system.
