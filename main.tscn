@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://dpdfrpelfcyhq"]
 
 [ext_resource type="Script" uid="uid://bjw2w0uxxynyk" path="res://main.gd" id="1_ig7tw"]
-[ext_resource type="Texture2D" uid="uid://c7p68tjxceaib" path="res://icon.svg" id="2_0xm2m"]
 
 [sub_resource type="AudioStreamMicrophone" id="AudioStreamMicrophone_0xm2m"]
 
@@ -14,9 +13,8 @@ autoplay = true
 bus = &"MicBus"
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=1452782237]
-offset_right = 1147.0
-offset_bottom = 642.0
-
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=921490288]
-position = Vector2(439, 398)
-texture = ExtResource("2_0xm2m")
+offset_left = -6.0
+offset_top = -1.0
+offset_right = 1197.0
+offset_bottom = 691.0
+color = Color(0, 0, 0, 1)
