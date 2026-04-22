@@ -22,21 +22,3 @@ offset_top = -1.0
 offset_right = 1197.0
 offset_bottom = 691.0
 color = Color(0, 0, 0, 1)
-
-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1865739687]
-
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer" unique_id=489197595]
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="back" type="Button" parent="CanvasLayer/HBoxContainer" unique_id=1786611270]
-layout_mode = 2
-text = "BACK"
-
-[node name="pause" type="Button" parent="CanvasLayer/HBoxContainer" unique_id=1522703251]
-layout_mode = 2
-text = "PAUSE"
-
-[node name="mode" type="Button" parent="CanvasLayer/HBoxContainer" unique_id=475908219]
-layout_mode = 2
-text = "MODE"
