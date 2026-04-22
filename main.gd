@@ -6,44 +6,26 @@ class Star:
 	var radius = 0.0
 	var speed = 0.0
 	var size = 1.0
-	var color = Color.WHITE
-
-# -------- GAMMA BURST --------
-class Burst:
-	var pos = Vector2.ZERO
-	var angle = 0.0
-	var length = 0.0
-	var speed = 0.0
-	var life = 1.0
-	var color = Color.WHITE
-
 
 var stars = []
-var bursts = []
 
 var capture
 
 var volume = 0.0
 var smooth_volume = 0.0
-var prev_volume = 0.0
 
-var energy = 0.0
-var smooth_energy = 0.0
-
-# NEW: pitch
 var pitch = 0.0
 var smooth_pitch = 0.0
-
-var flash = 0.0
 
 @onready var bg = $ColorRect
 
 
+# -------- READY --------
 func _ready():
 	randomize()
 	bg.z_index = -1
 
-	for i in range(1200):
+	for i in range(900):
 		stars.append(create_star())
 
 	var idx = AudioServer.get_bus_index("MicBus")
@@ -54,37 +36,24 @@ func _ready():
 				capture = e
 
 
-# -------- STAR --------
+# -------- CREATE STAR --------
 func create_star():
 	var s = Star.new()
+
 	s.angle = randf() * TAU
-	s.radius = randf_range(50, 900)
+	s.radius = pow(randf(), 2.0) * 900.0
 	s.angle += s.radius * 0.04
-	s.speed = randf_range(0.1, 0.6)
-	s.size = randf_range(1.0, 3.0)
-	s.color = pick_color()
+
+	s.speed = randf_range(0.2, 0.8)
+	s.size = randf_range(1.0, 2.5)
+
 	return s
 
 
 # -------- PROCESS --------
 func _process(delta):
 	update_audio()
-
 	update_galaxy(delta)
-	update_bursts(delta)
-
-	var delta_v = volume - prev_volume
-
-	if volume > 0.2 and delta_v > 0.05:
-		flash = 1.0
-
-		for i in range(50):
-			spawn_burst()
-
-	prev_volume = volume
-
-	flash = lerp(flash, 0.0, 0.1)
-
 	queue_redraw()
 
 
@@ -94,41 +63,16 @@ func update_galaxy(delta):
 
 	for s in stars:
 		s.angle += rot_speed * s.speed * delta
-		s.radius += sin(s.angle * 2.0) * 0.3
-		s.color = pick_color()
-
-
-# -------- BURSTS --------
-func spawn_burst():
-	var b = Burst.new()
-
-	var size = get_viewport().get_visible_rect().size
-	var center = size / 2
-
-	b.pos = center
-	b.angle = randf() * TAU
-	b.length = randf_range(20, 60)
-	b.speed = randf_range(500, 1000)
-	b.life = 1.0
-	b.color = pick_color()
-
-	bursts.append(b)
-
-
-func update_bursts(delta):
-	for b in bursts:
-		b.length += b.speed * delta
-		b.life -= delta * 1.5
-
-	bursts = bursts.filter(func(b): return b.life > 0.0)
+		s.radius += sin(s.angle * 2.0) * 0.2
 
 
 # -------- DRAW --------
 func _draw():
+	if smooth_volume < 0.02:
+		return
+
 	var size = get_viewport().get_visible_rect().size
 	var center = size / 2
-
-	draw_circle(center, 60 + smooth_volume * 120, Color(1,1,1,0.15 + flash * 0.3))
 
 	for s in stars:
 		var pos = Vector2(
@@ -136,29 +80,72 @@ func _draw():
 			center.y + sin(s.angle) * s.radius
 		)
 
-		var c = s.color.lightened(flash)
+		var c = pick_color()
+		c.a = smooth_volume
+
 		draw_circle(pos, s.size, c)
 
-	for b in bursts:
-		var dir = Vector2(cos(b.angle), sin(b.angle))
-		var start = b.pos
-		var end = b.pos + dir * b.length
 
-		var c = b.color
-		c.a = b.life
+# -------- PITCH (AUTOCORRELATION) --------
+func estimate_pitch(buffer):
+	var size = buffer.size()
+	if size < 2:
+		return 0.0
 
-		draw_line(start, end, c, 2.0 + b.life * 3.0)
-		draw_line(start, end, Color(c.r, c.g, c.b, c.a * 0.2), 6.0)
+	var best_offset = 0
+	var best_corr = 0.0
+
+	for offset in range(20, 200):
+		var corr = 0.0
+
+		for i in range(size - offset):
+			corr += buffer[i].x * buffer[i + offset].x
+
+		if corr > best_corr:
+			best_corr = corr
+			best_offset = offset
+
+	if best_offset == 0:
+		return 0.0
+
+	return 44100.0 / best_offset
 
 
-# -------- COLOR BASED ON PITCH --------
+# -------- NOTE --------
+func freq_to_note(freq):
+	if freq <= 0:
+		return -1
+
+	var note = int(round(12.0 * log(freq / 440.0) / log(2.0)))
+	return (note % 12 + 12) % 12
+
+
+func is_major_note(note):
+	var major = [0, 2, 4, 5, 7, 9, 11]
+	return note in major
+
+
+# -------- COLOR --------
 func pick_color():
-	# LOW pitch → cold
-	if smooth_pitch < 0.5:
-		return Color.from_hsv(randf_range(0.55, 0.75), 0.8, 1.0)
+	var note = freq_to_note(smooth_pitch)
+
+	if note == -1:
+		return Color(0.1, 0.1, 0.2)
+
+	var is_major = is_major_note(note)
+
+	if is_major:
+		return Color.from_hsv(
+			randf_range(0.02, 0.12), # тёплый
+			0.9,
+			randf_range(0.8, 1.0)
+		)
 	else:
-	# HIGH pitch → warm
-		return Color.from_hsv(randf_range(0.0, 0.15), 0.9, 1.0)
+		return Color.from_hsv(
+			randf_range(0.55, 0.75), # холодный
+			0.8,
+			randf_range(0.8, 1.0)
+		)
 
 
 # -------- AUDIO --------
@@ -172,24 +159,16 @@ func update_audio():
 		var buffer = capture.get_buffer(frames)
 
 		var max_val = 0.0
-		var avg = 0.0
 
 		for frame in buffer:
-			var v = abs(frame.x)
-			max_val = max(max_val, v)
-			avg += v
+			max_val = max(max_val, abs(frame.x))
 
-		avg /= buffer.size()
+		volume = clamp(max_val * 10.0, 0.0, 1.0)
 
-		volume = clamp(max_val * 20.0, 0.0, 1.0)
-		energy = clamp(avg * 60.0, 0.0, 1.0)
-
-		# APPROX pitch (very simple)
-		pitch = clamp(avg * 10.0, 0.0, 1.0)
+		pitch = estimate_pitch(buffer)
 
 	smooth_volume = lerp(smooth_volume, volume, 0.1)
-	smooth_energy = lerp(smooth_energy, energy, 0.05)
 	smooth_pitch = lerp(smooth_pitch, pitch, 0.1)
 
 	if bg:
-		bg.color = Color(0, 0, 0.08)
+		bg.color = Color(0, 0, 0.05)
