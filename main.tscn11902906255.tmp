@@ -1,0 +1,108 @@
+[gd_scene format=3 uid="uid://bp48iihwf06aq"]
+
+[ext_resource type="Script" uid="uid://dr82lv4jg8l7x" path="res://main.gd" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://bemcxohg88r0s" path="res://spiral.gd" id="2_0xm2m"]
+
+[node name="Main" type="Node2D" unique_id=98258444]
+script = ExtResource("1_ig7tw")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1776746904]
+
+[node name="Title" type="Label" parent="CanvasLayer" unique_id=1082827706]
+anchors_preset = -1
+anchor_top = 0.033
+anchor_right = 1.0
+anchor_bottom = 0.25300002
+offset_left = 488.0
+offset_top = 0.6159992
+offset_right = -448.0
+offset_bottom = -118.944016
+text = "PRIME MUSIC GENERATOR"
+
+[node name="Info" type="Label" parent="CanvasLayer" unique_id=1147852675]
+anchors_preset = -1
+anchor_top = 0.033
+anchor_right = 1.0
+anchor_bottom = 0.25300002
+offset_left = 764.0
+offset_top = 99.616
+offset_right = -26.0
+offset_bottom = 6.0559845
+text = "Enter numbers. Prime numbers create melody.
+Examples: 2,3,5,7,11"
+
+[node name="Random" type="Button" parent="CanvasLayer" unique_id=347911245]
+offset_left = 1053.0
+offset_top = 11.0
+offset_right = 1130.0
+offset_bottom = 55.0
+text = "random"
+
+[node name="Back" type="Button" parent="CanvasLayer" unique_id=1609420257]
+offset_left = 9.0
+offset_top = 24.0
+offset_right = 86.0
+offset_bottom = 68.0
+text = "back"
+
+[node name="Wave" type="Button" parent="CanvasLayer" unique_id=1818548254]
+offset_left = 966.0
+offset_top = 11.0
+offset_right = 1043.0
+offset_bottom = 55.0
+text = "sine"
+
+[node name="NoteLabel" type="Label" parent="CanvasLayer" unique_id=66732982]
+offset_left = 545.0
+offset_top = 50.0
+offset_right = 762.0
+offset_bottom = 73.0
+text = "READY?"
+
+[node name="Input" type="LineEdit" parent="CanvasLayer" unique_id=1819330761]
+offset_left = 928.0
+offset_top = 149.0
+offset_right = 1130.0
+offset_bottom = 180.0
+
+[node name="Play" type="Button" parent="CanvasLayer" unique_id=136509404]
+offset_left = 1015.0
+offset_top = 193.0
+offset_right = 1124.0
+offset_bottom = 237.0
+text = "PLAY PRIMES
+"
+
+[node name="Tempo" type="HSlider" parent="CanvasLayer" unique_id=1082018227]
+offset_left = 36.0
+offset_top = 587.0
+offset_right = 455.0
+offset_bottom = 623.0
+
+[node name="Volume" type="HSlider" parent="CanvasLayer" unique_id=469566135]
+offset_left = 40.0
+offset_top = 504.0
+offset_right = 449.0
+offset_bottom = 573.0
+max_value = 0.5
+step = 0.01
+value = 0.2
+
+[node name="Mode" type="Button" parent="CanvasLayer" unique_id=170764968]
+offset_left = 91.0
+offset_top = 25.0
+offset_right = 206.0
+offset_bottom = 56.0
+text = "Prime Melody
+"
+
+[node name="Stop" type="Button" parent="CanvasLayer" unique_id=1660794689]
+offset_left = 235.0
+offset_top = 24.0
+offset_right = 361.0
+offset_bottom = 56.0
+text = "STOP
+"
+
+[node name="Spiral" type="Node2D" parent="." unique_id=1618959479]
+script = ExtResource("2_0xm2m")
